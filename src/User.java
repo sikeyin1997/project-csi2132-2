@@ -1,4 +1,6 @@
-import java.sql.Date;
+
+import java.util.Date;
+
 
 public class User {
    /* public String name;
@@ -13,24 +15,25 @@ public class User {
         private String accountType;
         private String password;
 
-        private long ssn;
-        private long phoneNO;
+        private Integer ssn;
+        private Integer phoneNO;
 
         private String firstName;
         private String midName;
         private String lastName;
 
+        private Integer houseNumber;
         private String streetName;
         private String city;
         private String province;
         private Date dateOfBirth;
-        private int age;
+        private Integer age;
 
         public Integer getId() {
             return id;
         }
 
-        public void setId(Integer id) {
+        public void setId(int id) {
             this.id = id;
         }
 
@@ -62,7 +65,7 @@ public class User {
             return ssn;
         }
 
-        public void setSsn(long ssn) {
+        public void setSsn(int ssn) {
             this.ssn = ssn;
         }
 
@@ -70,7 +73,7 @@ public class User {
             return phoneNO;
         }
 
-        public void setPhoneNO(long phoneNO) {
+        public void setPhoneNO(int phoneNO) {
             this.phoneNO = phoneNO;
         }
 
@@ -131,6 +134,7 @@ public class User {
         }
 
         public int getAge() {
+
             return age;
         }
 
@@ -138,5 +142,11 @@ public class User {
             this.age = age;
         }
 
+    public Integer getHouseNumber() {
+        return houseNumber;
+    }
 
+    public void setHouseNumber(Integer houseNumber) {
+        this.houseNumber = houseNumber;
+    }
 }
