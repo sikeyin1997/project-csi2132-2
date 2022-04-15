@@ -1,10 +1,13 @@
 import entity.User;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.Locale;
 
 public class LoginForm extends JDialog {
     private JTextField tfEmail;
@@ -34,8 +37,7 @@ public class LoginForm extends JDialog {
 
                 if (user != null) {
                     dispose();
-                }
-                else {
+                } else {
                     JOptionPane.showMessageDialog(LoginForm.this,
                             "Email or Password Invalid",
                             "Try again",
@@ -113,9 +115,9 @@ public class LoginForm extends JDialog {
             System.out.println("          Email: " + user.getEmail());
             System.out.println("          Phone: " + user.getPhoneNO());
             System.out.println("          Address: " + user.getStreetName());
-        }
-        else {
+        } else {
             System.out.println("Authentication canceled");
         }
     }
+
 }

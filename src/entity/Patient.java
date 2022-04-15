@@ -2,15 +2,15 @@ package entity;
 
 public class Patient {
 
-    private Integer insuranceNumber;
+    private Long insuranceNumber;
     private String gender;
     private Integer id;
 
-    public Integer getInsuranceNumber() {
+    public Long getInsuranceNumber() {
         return insuranceNumber;
     }
 
-    public void setInsuranceNumber(Integer insuranceNumber) {
+    public void setInsuranceNumber(Long insuranceNumber) {
         this.insuranceNumber = insuranceNumber;
     }
 

@@ -12,7 +12,7 @@ public class User {
         private String password;
 
         private Integer ssn;
-        private Integer phoneNO;
+        private Long phoneNO;
 
         private String firstName;
         private String midName;
@@ -65,11 +65,11 @@ public class User {
             this.ssn = ssn;
         }
 
-        public long getPhoneNO() {
+        public Long getPhoneNO() {
             return phoneNO;
         }
 
-        public void setPhoneNO(int phoneNO) {
+        public void setPhoneNO(Long phoneNO) {
             this.phoneNO = phoneNO;
         }
 
