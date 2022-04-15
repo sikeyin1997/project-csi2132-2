@@ -15,6 +15,7 @@ public class ReceptionPage extends JFrame {
     private JButton appointmentButton;
     private JButton registerButton;
     private JButton updateButton;
+    private JTextField PatientId;
 
     public ReceptionPage() {
         setTitle("Dashborad");
