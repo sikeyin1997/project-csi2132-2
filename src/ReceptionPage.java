@@ -1,3 +1,5 @@
+import entity.User;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -28,7 +30,7 @@ public class ReceptionPage extends JFrame {
             User user = loginForm.user;
 
             if (user != null) {
-                lbAdmin.setText("User: " + user.getFirstName());
+                lbAdmin.setText("entity.User: " + user.getFirstName());
                 setLocationRelativeTo(null);
                 setVisible(true);
             }
@@ -43,7 +45,7 @@ public class ReceptionPage extends JFrame {
             User user = registrationForm.user;
 
             if (user != null) {
-                lbAdmin.setText("User: " + user.getFirstName());
+                lbAdmin.setText("entity.User: " + user.getFirstName());
                 setLocationRelativeTo(null);
                 setVisible(true);
             }
