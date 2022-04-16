@@ -48,7 +48,7 @@ public class UpdatePatient extends JDialog {
         final String PASSWORD = "password";
         Connection myConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
         Statement myStmnt = myConn.createStatement();
-        String query = "select * from user, patient  where ID = " + userId.toString();
+        String query = "select * from user, patient  where user.ID = " + userId.toString();
         rs = myStmnt.executeQuery(query);
 
         if (rs.next()) {
