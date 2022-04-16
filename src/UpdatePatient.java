@@ -5,11 +5,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
 
 public class UpdatePatient extends JDialog {
     private JPanel updatePatientPanel;
@@ -32,6 +34,7 @@ public class UpdatePatient extends JDialog {
     private JLabel InsuranceNo;
 
     ResultSet globRES;
+    DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
 
 
     public UpdatePatient(JFrame parent, Integer userId) throws SQLException {
@@ -43,21 +46,22 @@ public class UpdatePatient extends JDialog {
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         ResultSet rs = null;
-        final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
-        final String USERNAME = "root";
-        final String PASSWORD = "password";
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
         Connection myConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
         Statement myStmnt = myConn.createStatement();
         String query = "select * from user, patient  where user.ID = " + userId.toString();
         rs = myStmnt.executeQuery(query);
 
         if (rs.next()) {
+            tfId.setText(String.valueOf(userId));
             tfEmail.setText(rs.getString("Email"));
             tfName.setText(rs.getString("FirstName"));
             tfMidname.setText(rs.getString("MidName"));
             tfLastname.setText(rs.getString("SecondName"));
-            tfSsn.setText(String.valueOf(rs.getInt("SSN")));
-            tfPhone.setText(String.valueOf(rs.getInt("PhoneNumber")));
+            tfSsn.setText(String.valueOf(rs.getLong("SSN")));
+            tfPhone.setText(String.valueOf(rs.getLong("PhoneNumber")));
             tfHouseNumber.setText(String.valueOf(rs.getInt("HouseNumber")));
             tfAddress.setText(rs.getString("StreetName"));
             tfCity.setText(rs.getString("City"));
@@ -102,7 +106,7 @@ public class UpdatePatient extends JDialog {
             Integer ssn = Integer.parseInt(tfSsn.getText());
             System.out.println("work");
 
-            Integer phone = Integer.parseInt(tfPhone.getText());
+            Long phone = Long.parseLong(tfPhone.getText());
             Integer houseNumber = Integer.parseInt(tfHouseNumber.getText());
             String address = tfAddress.getText();
             String city = tfCity.getText();
@@ -144,7 +148,7 @@ public class UpdatePatient extends JDialog {
                                              String midName,
                                              String lastName,
                                              String email,
-                                             Integer phone,
+                                             Long phone,
                                              Integer houseNumber,
                                              Integer ssn,
                                              String address,
@@ -156,42 +160,38 @@ public class UpdatePatient extends JDialog {
                 throws ParseException {
             User user = null;
             Patient patient = null;
-            final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
-            final String USERNAME = "root";
-            final String PASSWORD = "password";
+            final String DB_URL = defaultdatabaseURL.getUrl();
+            final String USERNAME = defaultdatabaseURL.getUser();
+            final String PASSWORD = defaultdatabaseURL.getPassword();
 
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
             Date dob = formatter.parse(dateOfBirth);
 
             Date today = new Date();
             Long time= today.getTime() / 1000 - dob.getTime() / 1000;
 
-            int age = Math.round(time) / 31536000;
+            int age = 21;
 
             try{
                 Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
                 // Connected to database successfully...
 
                 Statement stmt = conn.createStatement();
-                String sql = "UPDATE user " +
-                        "SET Email = ?, SSN = ?, PhoneNumber = ?, FirstName = ?, MidName = ?, " +
-                        "SecondName = ?, " +
-                        "HouseNumber = ?, StreetName = ?, City = ?, Province = ?, DateOfBirth = ?, Age = ?) " +
-                        "where ID = ? ";
+                String sql = "UPDATE user SET Email = ?, SSN = ?, FirstName = ?, MidName = ?, SecondName = ?, HouseNumber = ?, StreetName = ?, City = ?, Province = ?, DateOfBirth = ?, Age = ? where ID = ? ";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 preparedStatement.setString(1, email);
                 preparedStatement.setInt(2, ssn);
-                preparedStatement.setInt(3, phone);
-                preparedStatement.setString(4, firstName);
-                preparedStatement.setString(5, midName);
-                preparedStatement.setString(6, lastName);
-                preparedStatement.setInt(7, houseNumber);
-                preparedStatement.setString(8, address);
-                preparedStatement.setString(9, city);
-                preparedStatement.setString(10, province);
-                preparedStatement.setString(11, dateOfBirth);
-                preparedStatement.setInt(12, age);
-                preparedStatement.setInt(13, id);
+                //preparedStatement.setBigDecimal(3, BigDecimal.valueOf(phone));
+                preparedStatement.setString(3, firstName);
+                preparedStatement.setString(4, midName);
+                preparedStatement.setString(5, lastName);
+                preparedStatement.setInt(6, houseNumber);
+                preparedStatement.setString(7, address);
+                preparedStatement.setString(8, city);
+                preparedStatement.setString(9, province);
+                preparedStatement.setString(10, dateOfBirth);
+                preparedStatement.setInt(11, age);
+                preparedStatement.setInt(12, id);
 
                 //Insert row into the table
                 int addedRows = preparedStatement.executeUpdate();
@@ -214,14 +214,14 @@ public class UpdatePatient extends JDialog {
                 }
 
                 stmt.close();
-                conn.close();
+
 
 
 
 
                 Statement stmt2 = conn.createStatement();
                 String sql2 = "UPDATE patient " +
-                        "SET InsuranceNumber = ?, gender = ?) " +
+                        "SET InsuranceNumber = ?, gender = ?" +
                         "where ID = ? ";
                 PreparedStatement preparedStatement2 = conn.prepareStatement(sql2);
                 preparedStatement2.setString(2, gender);

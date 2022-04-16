@@ -27,7 +27,7 @@ public class PatientRegister extends JDialog {
         super(parent);
         setTitle("Create a new account");
         setContentPane(registerPanel);
-        setMinimumSize(new Dimension(800, 1500));
+        setMinimumSize(new Dimension(800, 1000));
         setModal(true);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
