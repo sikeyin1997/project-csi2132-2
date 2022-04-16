@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class ReceptionPage extends JFrame {
+public class ReceptionPage extends JDialog {
     private JPanel receptionPanel;
     private JLabel lbAdmin;
     private JButton appointmentButton;
@@ -15,18 +15,21 @@ public class ReceptionPage extends JFrame {
     private JButton updateButton;
     private JTextField PatientId;
 
-    public ReceptionPage() {
+    public ReceptionPage(JFrame parent) {
+        super(parent);
         setTitle("Reception");
         setContentPane(receptionPanel);
         setMinimumSize(new Dimension(600, 529));
-        setSize(1300, 1000);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+
 
 
         appointmentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CreateAppointment appointmentForm = new CreateAppointment(ReceptionPage.this);
+                CreateAppointment appointmentForm = new CreateAppointment(null);
                 Appointments appointment = appointmentForm.appointment;
 
                 if (appointment != null) {
@@ -69,7 +72,7 @@ public class ReceptionPage extends JFrame {
                     rs = statement.executeQuery(query);
 
                     if (rs.next()) {
-                        UpdatePatient updatePatient = new UpdatePatient(ReceptionPage.this, Integer.parseInt(PatientId.getText()));
+                        UpdatePatient updatePatient = new UpdatePatient(null, Integer.parseInt(PatientId.getText()));
 
                     }
 
@@ -81,11 +84,12 @@ public class ReceptionPage extends JFrame {
 
 
         });
+        setVisible(true);
     }
 
 
 
     public static void main(String[] args) {
-        ReceptionPage myForm = new ReceptionPage();
+        ReceptionPage myForm = new ReceptionPage(null);
     }
 }
