@@ -139,7 +139,7 @@ public class Dentist extends JFrame implements ActionListener {
     }
     public static void main(String[] args) {
 
-
+        PatientForm pt = new PatientForm();
         JFrame frame = new JFrame("Dentist");
         frame.setContentPane(new Dentist().Main);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -1,156 +1,201 @@
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.*;
+import java.util.ArrayList;
 
-public class PatientForm extends JDialog {
-    private JTextField tfFirstName;
-    private JTextField tfSecondName;
-    private JTextField tfMidName;
-    private JTextField tfHouseNumber;
-    private JTextField tfStreetName;
-    private JTextField tfCity;
-    private JTextField tfProvince;
-    private JTextField tfDateOfBirth;
-    private JTextField tfAge;
-    private JTextField tfInsuranceNumber;
-    private JTextField tfGender;
-    private JPasswordField passwordField1;
-    private JPasswordField passwordField2;
-    private JButton btnSubmit;
-    private JTextField tfEmail;
-    private JTextField tfPhoneNumber;
+public class PatientForm extends JFrame {
+
     private JPanel patientPanel;
-    private JTextField tfSSN;
+    private JTable upComing;
+    private JTable history;
+    private JButton setNewAppointmentButton;
+    private JPanel upC;
+    private JPanel hist;
+    Connection myConn;
+    Statement myStmnt;
 
-    public PatientForm(JFrame parent){
-        super(parent);
-        setTitle("Create a new account");
+    // for collecting data
+    ArrayList<Object> data1 = new ArrayList<>();
+    Object [][] historyData;
+    Object [][] upComingData;
+
+    int i1 = 0;
+    int prcRow =0;
+
+
+    public PatientForm() {
+
+
+
+        setTitle("Patient");
+        // establish connection
+        connection();
+        String histQuery = "select * from Appointments where Date < '2022-07-07' ";
+        String upComingQuery = "select * from Appointments where Date >'2022-07-07' " ;
+
+        // fetch data from database
+        historyData = getHistData(histQuery);
+        upComingData = getUpComingData(upComingQuery);
+
+        createHistTable();
+        createUpComingTable();
+
         setContentPane(patientPanel);
-        setMinimumSize(new Dimension(450, 475));
-        setModal(true);
-        setLocationRelativeTo(parent);
+        setMinimumSize(new Dimension(700, 474));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-        btnSubmit.addActionListener(new ActionListener() {
+        setVisible(true);
+        setNewAppointmentButton.addMouseListener(new MouseAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                registerPatient();
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+
+                goToAppointmentScheduler();
             }
         });
-        setVisible(true);
     }
 
-    private void registerPatient(){
-        String FirstName = tfFirstName.getText();
-        String SecondName = tfSecondName.getText();
-        String MidName = tfMidName.getText();
-        String Email = tfEmail.getText();
-        Integer PhoneNumber = Integer.parseInt(tfPhoneNumber.getText());
-        Integer InsuranceNumber = Integer.parseInt(tfInsuranceNumber.getText());
-        Integer SSN = Integer.parseInt(tfSSN.getText());
-        String Gender = tfGender.getText();
-        Integer HouseNumber = Integer.parseInt(tfHouseNumber.getText());
-        String StreetName = tfStreetName.getText();
-        String City = tfCity.getText();
-        String Province = tfProvince.getText();
-        String DateOfBirth = tfDateOfBirth.getText();
-        Integer Age = Integer.parseInt(tfAge.getText());
-        String Password = String.valueOf(passwordField1.getPassword());
-        String ConfirmPassword = String.valueOf(passwordField2.getPassword());
+    private void goToAppointmentScheduler(){
 
-        if(!passwordField1.equals(passwordField2)){
-            JOptionPane.showMessageDialog(this,
-                    "Passwords do not match");
-            return;
-        }
-
-        patient = addPatientToDatabase(FirstName, SecondName, MidName, Email, PhoneNumber, InsuranceNumber, SSN, Gender, HouseNumber, StreetName, City, Province, DateOfBirth, Age, Password);
-        if(patient != null){
-            dispose();
-        }
-        else {
-            JOptionPane.showMessageDialog(this,
-                    "Failed to Register Patient",
-                    "Try Again,",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+        AppointmentScheduler as = new AppointmentScheduler(this);
     }
 
-    public Patient patient;
-    private Patient addPatientToDatabase(String FirstName, String SecondName, String MidName, String Email, Integer PhoneNumber, Integer InsuranceNumber, Integer SSN, String Gender, Integer HouseNumber, String StreetName, String City, String Province, String DateOfBirth, Integer Age, String Password){
-        Patient patient = null;
-        final String DB_URL = "DBlink"; //link here
-        final String DBUserName = "root";
-        final String DBPassword = "";
-
+    void connection(){
         try{
-            Connection conn = DriverManager.getConnection(DB_URL, DBUserName, Password);
+            myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dentalCentreDatabase", "root", "hs6292953");
+            myStmnt = myConn.createStatement();
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
+    }
 
-            Statement statement = conn.createStatement();
-            String sql = ("BEGIN; INSERT INTO user (Email, Password, SSN, PhoneNumber, FirstName, MidName, SecondName, HouseNumber, StreetName, City, Province, DateOfBirth, Age)"
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-                    + "INSERT INTO Patient (InsuranceNumber, Gender)"
-                    + "VALUES(?, ?)"
-                    + "COMMIT;");
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setString(1, Email);
-            preparedStatement.setString(2, Password);
-            preparedStatement.setInt(3, SSN);
-            preparedStatement.setInt(4, PhoneNumber);
-            preparedStatement.setString(5, FirstName);
-            preparedStatement.setString(6, MidName);
-            preparedStatement.setString(7, SecondName);
-            preparedStatement.setInt(8, HouseNumber);
-            preparedStatement.setString(9, StreetName);
-            preparedStatement.setString(10, City);
-            preparedStatement.setString(11, Province);
-            preparedStatement.setString(12, DateOfBirth);
-            preparedStatement.setInt(13, Age);
-            preparedStatement.setInt(14, InsuranceNumber);
-            preparedStatement.setString(15, Gender);
+    private Object [][]  getHistData(String query){
 
-            int addedRows = preparedStatement.executeUpdate();
-            if (addedRows>0){
-                patient = new Patient();
-                patient.Email = Email;
-                patient.Password = Password;
-                patient.SSN = SSN;
-                patient.PhoneNumber = PhoneNumber;
-                patient.FirstName = FirstName;
-                patient.MidName = MidName;
-                patient.SecondName = SecondName;
-                patient.HouseNumber = HouseNumber;
-                patient.StreetName = StreetName;
-                patient.City = City;
-                patient.Province = Province;
-                patient.DateOfBirth = DateOfBirth;
-                patient.Age = Age;
-                patient.InsuranceNumber = InsuranceNumber;
-                patient.Gender = Gender;
+        // get connection
+        try {
+
+
+            Statement myStmnt = myConn.createStatement();
+            ResultSet myRes = myStmnt.executeQuery(query);
+            int j =0;
+            while (myRes.next()){
+                data1.add(myRes.getString("PatientNumber")) ;
+                data1.add(myRes.getString("DentistNO"));
+                data1.add(myRes.getString("Date"));
+                data1.add(myRes.getString("StartTime"));
+                data1.add(myRes.getString("EndTime"));
+                data1.add(myRes.getString("AppoitmentType"));
+                data1.add(myRes.getString("Status"));
+                data1.add(myRes.getString("Room"));
             }
+        } catch (Exception exp) {
+            exp.printStackTrace();
+        }
 
-            statement.close();
-            conn.close();
+        // previous row in prcRow
+        prcRow = i1;
+        i1 = data1.size() / 8;
 
-        } catch(Exception e){
-            e.printStackTrace();
+        Object mydata [][] = new Object[i1][];
+        int j =0;
+        for(int i =0; i < data1.size(); i = i+8){
+
+
+            Object s[] = {data1.get(i),data1.get(i+1), data1.get(i+2), data1.get(i+3), data1.get(i+4), data1.get(i+5), data1.get(i+6),data1.get(i+7)};
+            mydata[j] = s;
+            j++;
         }
-        return patient;
+        data1 = new ArrayList<>();
+        return mydata;
     }
-    public static void main(String[] args) {
-        PatientForm myForm = new PatientForm(null);
-        Patient patient = myForm.patient;
-        if (patient != null){
-            System.out.println("Successful Registration of: " + patient.FirstName + patient.SecondName);
+
+    private Object [][] getUpComingData(String query) {
+
+        // get connection
+        try {
+
+
+            Statement myStmnt = myConn.createStatement();
+            ResultSet myRes = myStmnt.executeQuery(query);
+            int j = 0;
+            while (myRes.next()) {
+                data1.add(myRes.getString("PatientNumber")) ;
+                data1.add(myRes.getString("DentistNO"));
+                data1.add(myRes.getString("Date"));
+                data1.add(myRes.getString("StartTime"));
+                data1.add(myRes.getString("EndTime"));
+                data1.add(myRes.getString("AppoitmentType"));
+                data1.add(myRes.getString("Status"));
+                data1.add(myRes.getString("Room"));
+            }
+        } catch (Exception exp) {
+            exp.printStackTrace();
         }
-        else {
-            System.out.println("Unsuccessful Registration");
+
+        // previous row in prcRow
+        prcRow = i1;
+        i1 = data1.size() / 8;
+
+        Object mydata[][] = new Object[i1][];
+        int j = 0;
+        for (int i = 0; i < data1.size(); i = i + 8) {
+
+
+            Object s[] = {data1.get(i), data1.get(i + 1), data1.get(i + 2), data1.get(i + 3), data1.get(i + 4), data1.get(i + 5), data1.get(i + 6), data1.get(i + 7)};
+            mydata[j] = s;
+            j++;
         }
+        data1 = new ArrayList<>();
+        return mydata;
+
+
     }
+
+    private void createHistTable(){
+
+        hist.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createEtchedBorder(), "Patient History", TitledBorder.LEFT,
+                TitledBorder.TOP));
+
+        history.setModel(new DefaultTableModel(
+                                historyData,
+                                new String[]{"PatientNumber", "enstist Number", "Date", "Start Time", "End Time","AppointmentType", "Status", "Room" })
+
+                        {
+                            @Override
+                            public boolean isCellEditable(int row, int column) {
+
+                                return false;
+                            }
+                        }
+        );
+    }
+
+    private void createUpComingTable(){
+
+        upC.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createEtchedBorder(), "Up Coming Appointment", TitledBorder.LEFT,
+                TitledBorder.TOP));
+        upComing.setModel(new DefaultTableModel(
+                                 upComingData,
+                                 new String[]{"PatientNumber", "enstist Number", "Date", "Start Time", "End Time","AppointmentType", "Status", "Room" })
+
+                         {
+                             @Override
+                             public boolean isCellEditable(int row, int column) {
+
+                                 return false;
+                             }
+                         }
+        );
+
+    }
+
 
 }

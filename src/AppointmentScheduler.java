@@ -24,6 +24,7 @@ public class AppointmentScheduler extends JDialog {
         setMinimumSize(new Dimension(450, 475));
         setModal(true);
         setLocationRelativeTo(parent);
+
         btnSubmit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -104,13 +105,13 @@ public class AppointmentScheduler extends JDialog {
     }
     public static void main(String[] args) {
         AppointmentScheduler myAppointment = new AppointmentScheduler(null);
-        Appointments appointments1 = myAppointment.appointments;
-        if (appointments1 != null){
+        //Appointments appointments1 = myAppointment.appointments;
+       /* if (appointments1 != null){
             System.out.println("Appointment Schedule Completed");
         }
         else{
             System.out.println("Appointment Schedule Failed");
-        }
+        }*/
     }
 }
 
