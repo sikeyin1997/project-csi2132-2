@@ -43,9 +43,11 @@ public class UpdatePatient extends JDialog {
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         ResultSet rs = null;
-        final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
-        final String USERNAME = "root";
-        final String PASSWORD = "password";
+
+        DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
         Connection myConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
         Statement myStmnt = myConn.createStatement();
         String query = "select * from user, patient  where user.ID = " + userId.toString();
@@ -154,11 +156,13 @@ public class UpdatePatient extends JDialog {
                                              Integer insurance,
                                              String gender)
                 throws ParseException {
-            User user = null;
-            Patient patient = null;
-            final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
-            final String USERNAME = "root";
-            final String PASSWORD = "password";
+            User user = new User();
+            Patient patient = new Patient();
+
+            DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+            final String DB_URL = defaultdatabaseURL.getUrl();
+            final String USERNAME = defaultdatabaseURL.getUser();
+            final String PASSWORD = defaultdatabaseURL.getPassword();
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             Date dob = formatter.parse(dateOfBirth);
@@ -215,9 +219,6 @@ public class UpdatePatient extends JDialog {
 
                 stmt.close();
                 conn.close();
-
-
-
 
                 Statement stmt2 = conn.createStatement();
                 String sql2 = "UPDATE patient " +

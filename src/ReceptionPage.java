@@ -59,13 +59,14 @@ public class ReceptionPage extends JDialog {
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String MYSQL_SERVER_URL = "jdbc:mysql://localhost/";
-                final String USERNAME = "root";
-                final String PASSWORD = "password";
+                DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+                final String DB_URL = defaultdatabaseURL.getUrl();
+                final String USERNAME = defaultdatabaseURL.getUser();
+                final String PASSWORD = defaultdatabaseURL.getPassword();
                 ResultSet rs = null;
                 try {
                     //First, connect to MYSQL server and create the database if not created
-                    Connection conn = DriverManager.getConnection(MYSQL_SERVER_URL, USERNAME, PASSWORD);
+                    Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
                     Statement statement = conn.createStatement();
                     String query = "select * from users where ID = " + PatientId.getText();
 
