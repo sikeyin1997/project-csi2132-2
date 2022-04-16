@@ -213,8 +213,14 @@ public class AppointmentProcedure extends JFrame{
     }
 
     void connection(){
+
+        DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
+
         try{
-            myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dentalCentreDatabase", "root", "hs6292953");
+            myConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             myStmnt = myConn.createStatement();
         }
         catch (Exception exp) {
