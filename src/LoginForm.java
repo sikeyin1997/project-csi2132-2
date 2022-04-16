@@ -1,4 +1,5 @@
 import entity.Employee;
+import entity.Patient;
 import entity.User;
 
 import javax.swing.*;
@@ -9,7 +10,7 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class LoginForm extends JDialog {
+public class LoginForm extends JFrame {
     private JTextField tfEmail;
     private JPasswordField pfPassword;
     private JButton btnOK;
@@ -20,14 +21,13 @@ public class LoginForm extends JDialog {
 
     protected User user;
     protected Employee employee;
+    protected Patient patient;
 
-    public LoginForm(JFrame parent) {
-        super(parent);
+    public LoginForm() {
+
         setTitle("Login");
         setContentPane(loginPanel);
         setMinimumSize(new Dimension(450, 474));
-        setModal(true);
-        setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         btnOK.addActionListener(new ActionListener() {
@@ -38,14 +38,28 @@ public class LoginForm extends JDialog {
 
                 getAuthenticatedUser(email, password);
 
+                if(user.getAccountType().equals("patient") || user.getAccountType().equals("Patient")){
+
+                    getAuthennicatePatient(user.getId());
+
+                    PatientForm patientForm = new PatientForm();
+                }
+
                 if(user.getAccountType().equals("Employee") || user.getAccountType().equals("employee")){
 
                     getAuthenicateEmployee(user.getId());
                     System.out.println("the employee type is " + employee.getEmployeeType());
 
+
+
                     if(employee.getEmployeeType().equals("dentist") || employee.getEmployeeType().equals("Dentist")){
 
                         DentistForm dentistForm = new DentistForm(employee.getEmployeeNumber());
+                    }
+
+                    if(employee.getEmployeeType().equals("receptionist") || employee.getEmployeeType().equals("Receptionist")){
+
+                        ReceptionPage receptionPage = new ReceptionPage(LoginForm.this);
                     }
 
                 }
@@ -69,6 +83,49 @@ public class LoginForm extends JDialog {
         });
 
         setVisible(true);
+    }
+
+
+    private Patient getAuthennicatePatient(Integer id){
+
+        Statement st = null;
+        ResultSet rs = null;
+
+        employee = new Employee();
+
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
+
+        try {
+            // Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection db = DriverManager.getConnection(DB_URL,
+                    USERNAME, PASSWORD);
+            st = db.createStatement();
+            String sql = "SELECT * FROM patient WHERE ID=?";
+            PreparedStatement preparedStatement = db.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+
+            rs = preparedStatement.executeQuery();
+
+
+            while (rs.next()) {
+
+                patient.setInsuranceNumber(rs.getLong(1));
+                patient.setGender(rs.getString(2));
+                patient.setId(rs.getInt(3));
+
+            }
+
+
+            st.close();
+            db.close();
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return patient;
     }
 
     private Employee getAuthenicateEmployee(Integer id){
@@ -180,7 +237,7 @@ public class LoginForm extends JDialog {
     }
 
     public static void main(String[] args) {
-        LoginForm loginForm = new LoginForm(null);
+        LoginForm loginForm = new LoginForm();
         User user = loginForm.user;
         if (user != null) {
             System.out.println("Successful Authentication of: " + user.getFirstName());

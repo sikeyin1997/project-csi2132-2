@@ -22,7 +22,7 @@ public class DashboardForm extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                LoginForm loginForm = new LoginForm(DashboardForm.this);
+                LoginForm loginForm = new LoginForm();
             }
         });
 
