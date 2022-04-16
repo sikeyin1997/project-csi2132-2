@@ -1,13 +1,13 @@
+import entity.Employee;
 import entity.User;
 
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class LoginForm extends JDialog {
     private JTextField tfEmail;
@@ -16,7 +16,8 @@ public class LoginForm extends JDialog {
     private JButton btnCancel;
     private JPanel loginPanel;
 
-    public User user;
+    protected User user;
+    protected Employee employee;
 
     public LoginForm(JFrame parent) {
         super(parent);
@@ -33,10 +34,23 @@ public class LoginForm extends JDialog {
                 String email = tfEmail.getText();
                 String password = String.valueOf(pfPassword.getPassword());
 
-                user = getAuthenticatedUser(email, password);
+                getAuthenticatedUser(email, password);
+
+                if(user.getAccountType().equals("Employee") || user.getAccountType().equals("employee")){
+
+                    getAuthenicateEmployee(user.getId());
+                    System.out.println("the employee type is " + employee.getEmployeeType());
+
+                    if(employee.getEmployeeType().equals("dentist") || employee.getEmployeeType().equals("Dentist")){
+
+                        DentistForm dentistForm = new DentistForm(employee.getEmployeeNumber());
+                    }
+
+                }
 
                 if (user != null) {
                     dispose();
+
                 } else {
                     JOptionPane.showMessageDialog(LoginForm.this,
                             "Email or Password Invalid",
@@ -55,9 +69,49 @@ public class LoginForm extends JDialog {
         setVisible(true);
     }
 
+    private Employee getAuthenicateEmployee(Integer id){
+
+        Statement st = null;
+        ResultSet rs = null;
+
+        employee = new Employee();
+
+        try {
+            // Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection db = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/project",
+                    "root", "Tom_yin0818");
+            st = db.createStatement();
+            String sql = "SELECT * FROM employees WHERE ID=?";
+            PreparedStatement preparedStatement = db.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+
+            rs = preparedStatement.executeQuery();
+
+
+            while (rs.next()) {
+
+               employee.setEmployeeNumber(rs.getInt(1));
+               employee.setEmployeeType(rs.getString(2));
+               employee.setSalary(rs.getInt(3));
+               employee.setEmployeeRole(rs.getString(4));
+               employee.setId(rs.getInt(5));
+               employee.setBranchName(rs.getString(6));
+            }
+
+
+            st.close();
+            db.close();
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+       return employee;
+
+    }
 
     private User getAuthenticatedUser(String email, String password) {
-        User user = null;
+        user = new User();
 
         Statement st = null;
         ResultSet rs = null;
@@ -67,36 +121,44 @@ public class LoginForm extends JDialog {
             Connection db = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/project",
                     "root", "Tom_yin0818");
             st = db.createStatement();
-            rs = st.executeQuery("SELECT * FROM project.user");
-            ResultSetMetaData rsMetaData = rs.getMetaData();//new
-            rsMetaData.getColumnCount();
-            System.out.println(" Connection built !");//connection to database is built.
+            String sql = "SELECT * FROM project.user WHERE Email=? AND Password=?";
+            PreparedStatement preparedStatement = db.prepareStatement(sql);
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, password);
+
+            rs = preparedStatement.executeQuery();
 
             //panel(db);
 
             while (rs.next()) {
-                System.out.print("Columns returned: \n");
-                System.out.print("\t" + rs.getString(1));
-                System.out.print("\t" + rs.getString(2));
-                System.out.print("\t" + rs.getString(3));
-                System.out.print("\t" + rs.getString(4));
-                System.out.print("\t" + rs.getString(5));
-                System.out.print("\t" + rs.getString(6));
-                System.out.print("\t" + rs.getString(7));
-                System.out.print("\t" + rs.getString(8));
-                System.out.print("\t" + rs.getString(9));
-                System.out.print("\t" + rs.getString(10));
-                System.out.print("\t" + rs.getString(11));
-                System.out.print("\t" + rs.getString(12));
-                System.out.print("\t" + rs.getString(13));
-                System.out.print("\t" + rs.getString(14));
-                System.out.print("\t" + rs.getString(15));
 
-                System.out.println();
+                user.setId(rs.getInt(1));
+                user.setEmail(rs.getString(2));
+
+                user.setAccountType(rs.getString(3));
+
+                user.setPassword(rs.getString(4));
+                user.setSsn(rs.getInt(5));
+                user.setPhoneNO(rs.getLong(6));
+                user.setFirstName(rs.getString(7));
+                user.setMidName(rs.getString(8));
+                user.setLastName(rs.getString(9));
+                user.setHouseNumber(rs.getInt(10));
+                user.setStreetName(rs.getString(11));
+                user.setCity(rs.getString(12));
+                user.setProvince(rs.getString(13));
+
+                String dateOfBirth = rs.getString(14);
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                Date dob = formatter.parse(dateOfBirth);
+                user.setDateOfBirth(dob);
+
+                user.setAge(rs.getInt(15));
             }
 
             rs.close();
             st.close();
+            db.close();
 
 
         } catch (Exception e) {
