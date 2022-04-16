@@ -92,9 +92,10 @@ public class CreateAppointment extends JDialog {
                                             String rm)
     {
 
-        final String DB_URL = "jdbc:mysql://localhost/project?serverTimezone=UTC";
-        final String USERNAME = "root";
-        final String PASSWORD = "password";
+        DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
 
         try{
             Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);

@@ -60,8 +60,14 @@ public class DentistForm extends JFrame implements ActionListener {
     }
 
     void connection(){
+
+        DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
+
         try{
-            myConn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/project", "root", "Tom_yin0818");
+            myConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             myStmnt = myConn.createStatement();
         }
         catch (Exception exp) {

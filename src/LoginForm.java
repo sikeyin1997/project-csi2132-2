@@ -16,6 +16,8 @@ public class LoginForm extends JDialog {
     private JButton btnCancel;
     private JPanel loginPanel;
 
+    DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+
     protected User user;
     protected Employee employee;
 
@@ -76,10 +78,14 @@ public class LoginForm extends JDialog {
 
         employee = new Employee();
 
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
+
         try {
             // Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection db = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/project",
-                    "root", "Tom_yin0818");
+            Connection db = DriverManager.getConnection(DB_URL,
+                    USERNAME, PASSWORD);
             st = db.createStatement();
             String sql = "SELECT * FROM employees WHERE ID=?";
             PreparedStatement preparedStatement = db.prepareStatement(sql);
@@ -116,10 +122,15 @@ public class LoginForm extends JDialog {
         Statement st = null;
         ResultSet rs = null;
 
+
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
+
         try {
             // Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection db = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/project",
-                    "root", "Tom_yin0818");
+            Connection db = DriverManager.getConnection(DB_URL,
+                    USERNAME, PASSWORD);
             st = db.createStatement();
             String sql = "SELECT * FROM project.user WHERE Email=? AND Password=?";
             PreparedStatement preparedStatement = db.prepareStatement(sql);
@@ -159,7 +170,6 @@ public class LoginForm extends JDialog {
             rs.close();
             st.close();
             db.close();
-
 
         } catch (Exception e) {
             e.printStackTrace();

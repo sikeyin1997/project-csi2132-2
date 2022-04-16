@@ -2,8 +2,6 @@ import entity.Patient;
 import entity.User;
 
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,18 +10,17 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+
 
 public class PatientRegister extends JDialog {
 
     private JButton btnRegister;
     private JButton btnCancel;
     private JPanel registerPanel;
-    private JTextField tfSsn;
     private JTextField tfGender;
     private JTextField tfInsuranceNO;
+
+    private DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
 
 
     public PatientRegister(JFrame parent, Integer id) {
@@ -95,9 +92,9 @@ public class PatientRegister extends JDialog {
             throws ParseException, NullPointerException {
         User user = null;
         patient = new Patient();
-        final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
-        final String USERNAME = "root";
-        final String PASSWORD = "Tom_yin0818";
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
 
 
         try {
