@@ -5,7 +5,7 @@ import java.util.Date;
 public class Reviews {
 
     private Date reviewDate;
-    private Integer InsuranceNumber;
+    private Long InsuranceNumber;
     private Integer employeeNumber;
 
     public Date getReviewDate() {
@@ -16,11 +16,11 @@ public class Reviews {
         this.reviewDate = reviewDate;
     }
 
-    public Integer getInsuranceNumber() {
+    public Long getInsuranceNumber() {
         return InsuranceNumber;
     }
 
-    public void setInsuranceNumber(Integer insuranceNumber) {
+    public void setInsuranceNumber(Long insuranceNumber) {
         InsuranceNumber = insuranceNumber;
     }
 

@@ -3,7 +3,7 @@ package entity;
 public class ResponsibleParty {
 
     private String relationshipToPatient;
-    private Integer InsuranceNumber;
+    private Long InsuranceNumber;
     private Integer id;
 
     public String getRelationshipToPatient() {
@@ -14,11 +14,11 @@ public class ResponsibleParty {
         this.relationshipToPatient = relationshipToPatient;
     }
 
-    public Integer getInsuranceNumber() {
+    public Long getInsuranceNumber() {
         return InsuranceNumber;
     }
 
-    public void setInsuranceNumber(Integer insuranceNumber) {
+    public void setInsuranceNumber(Long insuranceNumber) {
         InsuranceNumber = insuranceNumber;
     }
 

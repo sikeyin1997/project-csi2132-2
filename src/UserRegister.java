@@ -1,18 +1,20 @@
+import entity.Patient;
 import entity.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class RegistrationForm extends JDialog {
+public class UserRegister extends JFrame {
+    private JButton btnRegister;
+
+    private DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+
     private JTextField tfName;
     private JTextField tfId;
     private JTextField tfHouseNumber;
@@ -22,36 +24,62 @@ public class RegistrationForm extends JDialog {
     private JTextField tfMidname;
     private JTextField tfLastname;
     private JTextField tfDateOfBirth;
-    private JTextField tfAccountType;
     private JTextField tfProvince;
     private JTextField tfCity;
     private JPasswordField pfPassword;
     private JPasswordField pfConfirmPassword;
-    private JButton btnRegister;
     private JButton btnCancel;
     private JPanel registerPanel;
     private JTextField tfSsn;
+    private JTextField tfAccountType;
+    private JTextField tfGender;
+    private JTextField tfInsuranceNO;
 
-
-    public RegistrationForm(JFrame parent) {
-        super(parent);
-        setTitle("Create a new account");
+    public UserRegister() {
+       // super(parent);
+        setTitle("Dashborad");
         setContentPane(registerPanel);
-        setMinimumSize(new Dimension(800, 1500));
-        setModal(true);
-        setLocationRelativeTo(parent);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+      //  setModal(true);
+        setMinimumSize(new Dimension(500, 1500));
+        setSize(1200, 700);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
 
         btnRegister.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 try {
                     registerUser();
+
+                    if ((user.getAccountType().equals("Patient") || user.getAccountType().equals("patient"))
+                        && user.getAge()>15){
+                        dispose();
+                        PatientRegister patientRegister = new PatientRegister(UserRegister.this, user.getId());
+                    }
+
+                    if ((user.getAccountType().equals("Employee") || user.getAccountType().equals("employee"))
+                            && user.getAge()>15){
+                        dispose();
+                        EmployeeRegister employeeRegister = new EmployeeRegister(UserRegister.this, user.getId());
+                    }
+
+                    /*
+                    if (user != null) {
+                        JOptionPane.showMessageDialog(UserRegister.this,
+                                "New user: " + user.getFirstName(),
+                                "Successful Registration",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                    }*/
+
                 } catch (ParseException ex) {
                     ex.printStackTrace();
                 }
+
             }
         });
+
         btnCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -71,9 +99,8 @@ public class RegistrationForm extends JDialog {
         String accountType = tfAccountType.getText();
 
         Integer ssn = Integer.parseInt(tfSsn.getText());
-        System.out.println("work");
 
-        Integer phone = 4566545;//Integer.parseInt(tfPhone.getText());
+        Long phone = Long.parseLong(tfPhone.getText());
         Integer houseNumber = Integer.parseInt(tfHouseNumber.getText());
         String address = tfAddress.getText();
         String city = tfCity.getText();
@@ -82,10 +109,8 @@ public class RegistrationForm extends JDialog {
         String dateOfBirth = tfDateOfBirth.getText();
         String password = String.valueOf(pfPassword.getPassword());
         String confirmPassword = String.valueOf(pfConfirmPassword.getPassword());
-        System.out.println(province);
-
-        if (id == null || firstName.isEmpty() || email.isEmpty() || lastName.isEmpty() || accountType.isEmpty()
-        || phone == null || ssn == null || address.isEmpty() || city.isEmpty() || password.isEmpty() ||
+        if (id == null || firstName.isEmpty() || email.isEmpty() || lastName.isEmpty() || phone == null
+                || ssn == null || address.isEmpty() || city.isEmpty() || password.isEmpty() || accountType.isEmpty() ||
                 dateOfBirth.isEmpty() || houseNumber == null || province.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "Please enter all fields",
@@ -93,6 +118,14 @@ public class RegistrationForm extends JDialog {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        // Converting date type and calculating ages
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        Date dob = formatter.parse(dateOfBirth);
+        Date today = new Date();
+        Long time = today.getTime() / 1000 - dob.getTime() / 1000;
+        int age = Math.round(time) / 31536000;
+
 
         if (!password.equals(confirmPassword)) {
             JOptionPane.showMessageDialog(this,
@@ -103,37 +136,38 @@ public class RegistrationForm extends JDialog {
         }
 
         user = addUserToDatabase(id, firstName, midName, lastName, email, accountType, phone, houseNumber, ssn,
-                address, city, province, password, dateOfBirth);
+                address, city, province, password, dateOfBirth, age);
+
         if (user != null) {
             dispose();
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog(this,
                     "Failed to register new user",
                     "Try again",
                     JOptionPane.ERROR_MESSAGE);
         }
+
+        setVisible(true);
+
     }
 
-    public User user;
+    protected User user;
+    protected Patient patient;
+
     private User addUserToDatabase(Integer id, String firstName, String midName, String lastName, String email,
-                                   String accountType, Integer phone, Integer houseNumber, Integer ssn,
-                                   String address, String city, String province, String password, String dateOfBirth)
-            throws ParseException {
-        User user = null;
-        final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
-        final String USERNAME = "root";
-        final String PASSWORD = "Tom_yin0818";
+                                   String accountType, Long phone, Integer houseNumber, Integer ssn,
+                                   String address, String city, String province, String password, String dateOfBirth,
+                                   int age)
+            throws ParseException, NullPointerException {
+        User user = new User();
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date dob = formatter.parse(dateOfBirth);
 
-        Date today = new Date();
-        Long time= today.getTime() / 1000 - dob.getTime() / 1000;
-
-        int age = Math.round(time) / 31536000;
-
-        try{
+        try {
             Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             // Connected to database successfully...
 
@@ -148,7 +182,7 @@ public class RegistrationForm extends JDialog {
             preparedStatement.setString(3, accountType);
             preparedStatement.setString(4, password);
             preparedStatement.setInt(5, ssn);
-            preparedStatement.setInt(6, phone);
+            preparedStatement.setLong(6, phone);
             preparedStatement.setString(7, firstName);
             preparedStatement.setString(8, midName);
             preparedStatement.setString(9, lastName);
@@ -165,39 +199,34 @@ public class RegistrationForm extends JDialog {
                 user = new User();
                 user.setId(id);
                 user.setFirstName(firstName);
-               user.setEmail(email);
-               user.setAccountType(accountType);
-               user.setPassword(password);
-               user.setSsn(ssn);
-               user.setPhoneNO(phone);
-               user.setFirstName(firstName);
-               user.setMidName(midName);
-               user.setLastName(lastName);
-               user.setHouseNumber(houseNumber);
-               user.setStreetName(address);
-               user.setCity(city);
-               user.setProvince(province);
-               user.setDateOfBirth(dob);
-               user.setAge(age);
+                user.setEmail(email);
+                user.setAccountType(accountType);
+                user.setPassword(password);
+                user.setSsn(ssn);
+                user.setPhoneNO(phone);
+                user.setFirstName(firstName);
+                user.setMidName(midName);
+                user.setLastName(lastName);
+                user.setHouseNumber(houseNumber);
+                user.setStreetName(address);
+                user.setCity(city);
+                user.setProvince(province);
+                user.setDateOfBirth(dob);
+                user.setAge(age);
             }
 
             stmt.close();
             conn.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return user;
+
     }
 
     public static void main(String[] args) {
-        RegistrationForm myForm = new RegistrationForm(null);
-        User user = myForm.user;
-        if (user != null) {
-            System.out.println("Successful registration of: " + user.getFirstName());
-        }
-        else {
-            System.out.println("Registration canceled");
-        }
+        UserRegister myForm = new UserRegister();
     }
+
 }

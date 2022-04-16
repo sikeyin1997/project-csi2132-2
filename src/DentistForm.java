@@ -5,7 +5,7 @@ import java.awt.event.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class Dentist extends JFrame implements ActionListener {
+public class DentistForm extends JFrame implements ActionListener {
     private JPanel Main;
     private JTable table1;
     private JTextArea textArea1;
@@ -18,12 +18,19 @@ public class Dentist extends JFrame implements ActionListener {
     ArrayList<Object> data1 = new ArrayList<>();
     ResultSet globRES;
 
-    public Dentist() {
+    public DentistForm(Integer employeeNumber) {
+
+        setTitle("Dentist");
+        setContentPane(Main);
+        //  setModal(true);
+        setMinimumSize(new Dimension(500, 1500));
+        setSize(1200, 700);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         //textArea1.addInputMethodListener(this);
         button1.addActionListener(this::actionPerformed);
         connection();
-        data = getData("select * from Appointments where DentistNO = 10006");
+        data = getData("select * from Appointments where DentistNO = " + employeeNumber);
         createTable();
 
 
@@ -48,11 +55,19 @@ public class Dentist extends JFrame implements ActionListener {
                 }
             }
         });
+
+        setVisible(true);
     }
 
     void connection(){
+
+        DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
+
         try{
-            myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dentalCentreDatabase", "root", "hs6292953");
+            myConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             myStmnt = myConn.createStatement();
         }
         catch (Exception exp) {
@@ -137,19 +152,6 @@ public class Dentist extends JFrame implements ActionListener {
                         }
         );
     }
-    public static void main(String[] args) {
-
-
-        JFrame frame = new JFrame("Dentist");
-        frame.setContentPane(new Dentist().Main);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-    }
-
-
-
-
 
     @Override
     public void actionPerformed(ActionEvent e) {
