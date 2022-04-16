@@ -9,6 +9,7 @@ public class DashboardForm extends JFrame {
     private JPanel dashboardPanel;
     private JLabel lbAdmin;
     private JButton btnRegister;
+    private JButton btmLogin;
 
     public DashboardForm() {
         setTitle("Dashborad");
@@ -17,10 +18,18 @@ public class DashboardForm extends JFrame {
         setSize(1200, 700);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        btmLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                LoginForm loginForm = new LoginForm(DashboardForm.this);
+            }
+        });
 
         btnRegister.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                dispose();
                 UserRegister userRegister = new UserRegister();
                 User user = userRegister.user;
 

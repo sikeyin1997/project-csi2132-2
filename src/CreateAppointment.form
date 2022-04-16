@@ -54,7 +54,7 @@
             </constraints>
             <properties>
               <font name="Segoe Print" size="18" style="1"/>
-              <text value="Dentist"/>
+              <text value="DentistForm"/>
             </properties>
           </component>
           <component id="9e341" class="javax.swing.JTextField" binding="dentistNo">
