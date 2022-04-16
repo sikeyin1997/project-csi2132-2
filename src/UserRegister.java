@@ -13,6 +13,8 @@ import java.util.Date;
 public class UserRegister extends JFrame {
     private JButton btnRegister;
 
+    private DefaultdatabaseURL defaultdatabaseURL = new DefaultdatabaseURL();
+
     private JTextField tfName;
     private JTextField tfId;
     private JTextField tfHouseNumber;
@@ -158,9 +160,9 @@ public class UserRegister extends JFrame {
                                    int age)
             throws ParseException, NullPointerException {
         User user = new User();
-        final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
-        final String USERNAME = "root";
-        final String PASSWORD = "Tom_yin0818";
+        final String DB_URL = defaultdatabaseURL.getUrl();
+        final String USERNAME = defaultdatabaseURL.getUser();
+        final String PASSWORD = defaultdatabaseURL.getPassword();
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date dob = formatter.parse(dateOfBirth);
