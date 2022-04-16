@@ -1,18 +1,17 @@
+import entity.Patient;
 import entity.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
-public class UpdatePatient extends JDialog{
+public class UpdatePatient extends JDialog {
     private JPanel updatePatientPanel;
     private JTextField tfName;
     private JTextField tfEmail;
@@ -32,35 +31,67 @@ public class UpdatePatient extends JDialog{
     private JTextField insuranceNo;
     private JLabel InsuranceNo;
 
+    ResultSet globRES;
 
-        public UpdatePatient(JFrame parent) {
-            super(parent);
-            setTitle("update patient info");
-            setContentPane(registerPanel);
-            setMinimumSize(new Dimension(800, 1500));
-            setModal(true);
-            setLocationRelativeTo(parent);
-            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-            btnUpdate.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        registerUser();
-                    } catch (ParseException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    dispose();
-                }
-            });
+    public UpdatePatient(JFrame parent, Integer userId) throws SQLException {
+        super(parent);
+        setTitle("update patient info");
+        setContentPane(updatePatientPanel);
+        setMinimumSize(new Dimension(800, 1000));
+        setModal(true);
+        setLocationRelativeTo(parent);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        ResultSet rs = null;
+        final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
+        final String USERNAME = "root";
+        final String PASSWORD = "password";
+        Connection myConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+        Statement myStmnt = myConn.createStatement();
+        String query = "select * from user, patient  where ID = " + userId.toString();
+        rs = myStmnt.executeQuery(query);
 
-            setVisible(true);
+        if (rs.next()) {
+            tfEmail.setText(rs.getString("Email"));
+            tfName.setText(rs.getString("FirstName"));
+            tfMidname.setText(rs.getString("MidName"));
+            tfLastname.setText(rs.getString("SecondName"));
+            tfSsn.setText(String.valueOf(rs.getInt("SSN")));
+            tfPhone.setText(String.valueOf(rs.getInt("PhoneNumber")));
+            tfHouseNumber.setText(String.valueOf(rs.getInt("HouseNumber")));
+            tfAddress.setText(rs.getString("StreetName"));
+            tfCity.setText(rs.getString("City"));
+            tfProvince.setText(rs.getString("Province"));
+            tfDateOfBirth.setText(rs.getString("DateOfBirth"));
+            insuranceNo.setText(String.valueOf(rs.getInt("InsuranceNumber")));
+            gender.setText(rs.getString("Gender"));
+            myStmnt.close();
+            myConn.close();
+
         }
+
+
+        btnUpdate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    updatePatient();
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+
+        setVisible(true);
+    }
+
+
 
         private void updatePatient() throws ParseException {
             Integer id = Integer.parseInt(tfId.getText());
@@ -71,18 +102,20 @@ public class UpdatePatient extends JDialog{
             Integer ssn = Integer.parseInt(tfSsn.getText());
             System.out.println("work");
 
-            Integer phone = 4566545;//Integer.parseInt(tfPhone.getText());
+            Integer phone = Integer.parseInt(tfPhone.getText());
             Integer houseNumber = Integer.parseInt(tfHouseNumber.getText());
             String address = tfAddress.getText();
             String city = tfCity.getText();
             String province = tfProvince.getText();
 
             String dateOfBirth = tfDateOfBirth.getText();
+            Integer insurance = Integer.parseInt(insuranceNo.getText());
+            String gend = gender.getText();
             System.out.println(province);
 
             if (id == null || firstName.isEmpty() || email.isEmpty() || lastName.isEmpty()
                     || phone == null || ssn == null || address.isEmpty() || city.isEmpty() ||
-                    dateOfBirth.isEmpty() || houseNumber == null || province.isEmpty()) {
+                    dateOfBirth.isEmpty() || houseNumber == null || province.isEmpty() || gend.isEmpty() || insurance == null) {
                 JOptionPane.showMessageDialog(this,
                         "Please enter all fields",
                         "Try again",
@@ -92,8 +125,8 @@ public class UpdatePatient extends JDialog{
 
 
 
-            user = updatePatientInDatabase(id, firstName, midName, lastName, email, phone, houseNumber, ssn,
-                    address, city, province, dateOfBirth);
+           User user = updatePatientInDatabase(id, firstName, midName, lastName, email, phone, houseNumber, ssn,
+                    address, city, province, dateOfBirth, insurance, gend);
             if (user != null) {
                 dispose();
             }
@@ -105,7 +138,7 @@ public class UpdatePatient extends JDialog{
             }
         }
 
-        public User user;
+
         private User updatePatientInDatabase(Integer id,
                                              String firstName,
                                              String midName,
@@ -117,9 +150,12 @@ public class UpdatePatient extends JDialog{
                                              String address,
                                              String city,
                                              String province,
-                                             String dateOfBirth)
+                                             String dateOfBirth,
+                                             Integer insurance,
+                                             String gender)
                 throws ParseException {
             User user = null;
+            Patient patient = null;
             final String DB_URL = "jdbc:mysql://127.0.0.1:3306/project";
             final String USERNAME = "root";
             final String PASSWORD = "password";
@@ -179,22 +215,54 @@ public class UpdatePatient extends JDialog{
 
                 stmt.close();
                 conn.close();
+
+
+
+
+                Statement stmt2 = conn.createStatement();
+                String sql2 = "UPDATE patient " +
+                        "SET InsuranceNumber = ?, gender = ?) " +
+                        "where ID = ? ";
+                PreparedStatement preparedStatement2 = conn.prepareStatement(sql2);
+                preparedStatement2.setString(2, gender);
+                preparedStatement2.setInt(1, insurance);
+                preparedStatement2.setInt(3, id);
+
+                //Insert row into the table
+                int addedRows2 = preparedStatement2.executeUpdate();
+                if (addedRows2 > 0) {
+                    patient = new Patient();
+                    patient.setId(id);
+                    patient.setGender(gender);
+                    patient.setInsuranceNumber(insurance);
+
+
+                }
+
+                stmt2.close();
+                conn.close();
+
+
+                if (user != null) {
+                    System.out.println("Successful update of: " + user.getFirstName());
+                }
+                else {
+                    System.out.println("update canceled");
+                }
+
+
+
             }catch(Exception e){
                 e.printStackTrace();
             }
-
             return user;
         }
 
-        public static void main(String[] args) {
-            RegistrationForm myForm = new RegistrationForm(null);
-            User user = myForm.user;
-            if (user != null) {
-                System.out.println("Successful registration of: " + user.getFirstName());
-            }
-            else {
-                System.out.println("Registration canceled");
-            }
+        public static void main(String[] args) throws SQLException {
+            int id = 000001;
+            UpdatePatient myForm = new UpdatePatient(null, id);
+
+
         }
     }
 
