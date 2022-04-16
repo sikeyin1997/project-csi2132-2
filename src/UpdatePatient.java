@@ -201,7 +201,7 @@ public class UpdatePatient extends JDialog {
                     user.setFirstName(firstName);
                     user.setEmail(email);
                     user.setSsn(ssn);
-                    user.setPhoneNO(phone);
+                    user.setPhoneNO(Long.valueOf(phone));
                     user.setFirstName(firstName);
                     user.setMidName(midName);
                     user.setLastName(lastName);
@@ -234,7 +234,7 @@ public class UpdatePatient extends JDialog {
                     patient = new Patient();
                     patient.setId(id);
                     patient.setGender(gender);
-                    patient.setInsuranceNumber(insurance);
+                    patient.setInsuranceNumber(Long.valueOf(insurance));
 
 
                 }
