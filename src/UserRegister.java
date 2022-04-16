@@ -40,8 +40,8 @@ public class UserRegister extends JFrame {
         setTitle("Dashborad");
         setContentPane(registerPanel);
       //  setModal(true);
-        setMinimumSize(new Dimension(500, 1500));
-        setSize(1200, 700);
+        setMinimumSize(new Dimension(500, 1000));
+        setSize(1200, 1000);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 

@@ -74,7 +74,7 @@ public class CreateAppointment extends JDialog {
         }
         else {
             JOptionPane.showMessageDialog(this,
-                    "Failed to register new user",
+                    "Failed to create appointment",
                     "Try again",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -102,8 +102,7 @@ public class CreateAppointment extends JDialog {
             // Connected to database successfully...
 
             Statement stmt = conn.createStatement();
-            String sql = "INSERT INTO Appointments (patId, denID, appDate, sTime, eTime, type, stat, rm) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO Appointments VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setString(1, patId);
             preparedStatement.setString(2, denID);
@@ -120,8 +119,8 @@ public class CreateAppointment extends JDialog {
                 appointment = new Appointments();
                 appointment.setPatientNumber(Integer.valueOf(patId));
                 appointment.setDentistNO(Integer.valueOf(denID));
-                Date date = (Date) new SimpleDateFormat("dd/MM/yyyy").parse(appDate);
-                appointment.setDate(date);
+
+
                 appointment.setStartTime(sTime);
                 appointment.setEndTime(eTime);
                 appointment.setAppointmentType(type);
